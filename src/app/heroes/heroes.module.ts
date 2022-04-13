@@ -1,5 +1,7 @@
+//modulos propios de angular
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 //modulos de terceros
 import { FlexLayoutModule } from '@angular/flex-layout';
@@ -32,9 +34,10 @@ import { ImagenPipe } from './pipes/imagen.pipe';
   ],
   imports: [
     CommonModule,
-    MaterialModule,
-    HeroesRoutingModule,
     FlexLayoutModule,
+    FormsModule,
+    HeroesRoutingModule,
+    MaterialModule,
   ]
 })
 export class HeroesModule { }
