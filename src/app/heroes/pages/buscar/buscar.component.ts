@@ -29,7 +29,6 @@ export class BuscarComponent implements OnInit {
 
   opcionSeleccionada( event: MatAutocompleteSelectedEvent ) {
 
-    //TODO: validar si es un string vacio
     //if( this.termino.trim().length === 0 ) return;
     if( !event.option.value) {
       this.heroeSeleccionado = undefined;
