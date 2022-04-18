@@ -1,9 +1,17 @@
+// propios de ng
 import { Component, OnInit } from '@angular/core';
+import { switchMap } from 'rxjs/operators';
+import { ActivatedRoute, Router } from '@angular/router';
+
+//de terceros
+import { MatCardLgImage } from '@angular/material/card';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+
+//personalizados
 import { Heroe, Publisher } from '../../interfaces/heroes.interfaces';
 import { HeroesService } from '../../services/heroes.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { switchMap } from 'rxjs/operators';
-import { MatCardLgImage } from '@angular/material/card';
+import { ConfirmarComponent } from '../../components/confirmar/confirmar.component';
 
 @Component({
   selector: 'app-agregar',
@@ -12,7 +20,6 @@ import { MatCardLgImage } from '@angular/material/card';
     `
     width: 100%;
     border-radius: 5px;
-
     `
   ]
 })
@@ -41,7 +48,9 @@ export class AgregarComponent implements OnInit {
   constructor(
     private heroesService: HeroesService,
     private activatedRoute: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog,
     ) { }
 
   ngOnInit(): void {
@@ -64,20 +73,39 @@ export class AgregarComponent implements OnInit {
     if( this.heroe.id ) {
       //update hero regisrter
       this.heroesService.updateHeroe( this.heroe )
-        .subscribe( heroe => console.log('Actualizando', heroe ) )
+        .subscribe( heroe => this.mostrarSnackBar('Registro Actualizado') );
     } else {
       //create hero register
       this.heroesService.addHeroe( this.heroe )
         .subscribe( heroe => {
-          this.router.navigate(['/heroes/editar', heroe.id])
+          this.router.navigate(['/heroes/editar', heroe.id]);
+          this.mostrarSnackBar('Héroe creado exitosamente')
         })
     }
   };
 
   borrarHeroe() {
-    this.heroesService.deleteHeroe( this.heroe.id! )
-      .subscribe( resp => {
-        this.router.navigate(['/heroes']);
-      })
+    const dialog =  this.dialog.open( ConfirmarComponent, {
+      width: '320px',
+      data: { ...this.heroe }
+    });
+
+    dialog.afterClosed().subscribe(
+      ( result ) => {
+        if( result ) {
+          this.heroesService.deleteHeroe( this.heroe.id! )
+            .subscribe( resp => {
+              this.router.navigate(['/heroes']);
+            })
+        }
+      }
+    )
+
+  }
+
+  mostrarSnackBar( mensaje: string ){
+    this.snackBar.open( mensaje, 'Ok!', {
+      duration: 2500
+    });
   }
 }
