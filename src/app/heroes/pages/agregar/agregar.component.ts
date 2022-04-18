@@ -3,11 +3,17 @@ import { Heroe, Publisher } from '../../interfaces/heroes.interfaces';
 import { HeroesService } from '../../services/heroes.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap } from 'rxjs/operators';
+import { MatCardLgImage } from '@angular/material/card';
 
 @Component({
   selector: 'app-agregar',
   templateUrl: './agregar.component.html',
   styles: [
+    `
+    width: 100%;
+    border-radius: 5px;
+
+    `
   ]
 })
 export class AgregarComponent implements OnInit {
@@ -40,10 +46,12 @@ export class AgregarComponent implements OnInit {
 
   ngOnInit(): void {
 
+    if ( !this.router.url.includes('editar') ) {
+      return;
+    }
     this.activatedRoute.params
-    //retrive the data  and fills the forms for editing
       .pipe(
-        switchMap( ({id}) => this.heroesService.getHeroePorId( id ))
+        switchMap( ({id} ) => this.heroesService.getHeroePorId( id ))
       )
       .subscribe( heroe => this.heroe = heroe );
   }
@@ -64,6 +72,12 @@ export class AgregarComponent implements OnInit {
           this.router.navigate(['/heroes/editar', heroe.id])
         })
     }
-  }
+  };
 
+  borrarHeroe() {
+    this.heroesService.deleteHeroe( this.heroe.id! )
+      .subscribe( resp => {
+        this.router.navigate(['/heroes']);
+      })
+  }
 }
